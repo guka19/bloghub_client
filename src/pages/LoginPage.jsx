@@ -1,16 +1,35 @@
 /* eslint-disable react/no-unescaped-entities */
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import DarkModeToggle from "@/components/ui/darkModeToggle";
+import { toast } from "react-toastify";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-  const handleLogin = () => {
-    console.log("Login attempted with:", { email, password });
+  const handleLogin = async () => {
+    try {
+      const response = await fetch("/api/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+      const token = data.token;
+      localStorage.setItem("authToken", token);
+      toast.success("Successfully logged in");
+      navigate("/");
+    } catch (err) {
+      console.log(err);
+      toast.error(err.message);
+    }
   };
 
   return (

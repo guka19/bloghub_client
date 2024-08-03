@@ -8,6 +8,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import PrivateRoute from "./guards/PrivateRoute";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ProfilePage from "./pages/ProfilePage";
 
 const App = () => {
   return (
@@ -21,6 +22,7 @@ const App = () => {
           </Route>
           <Route path="/" element={<PrivateRoute element={MainLayout} />}>
             <Route index element={<HomePage />} />
+            <Route path="/profile" element={ <ProfilePage /> } />
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>

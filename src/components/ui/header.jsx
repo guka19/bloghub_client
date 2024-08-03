@@ -8,7 +8,7 @@ import {
 } from "./dropdown-menu";
 import { Button } from "./button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, useNavigate, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import DarkModeToggle from "./darkModeToggle";
@@ -24,9 +24,10 @@ import {
 const Header = () => {
   const token = localStorage.getItem("authToken");
   const [user, setUser] = useState({});
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const decodeToken = async () => {
+    const fetchUser = async () => {
       if (token) {
         axios
           .get("/api/users/getById", {
@@ -43,11 +44,17 @@ const Header = () => {
       }
     };
 
-    decodeToken();
+    fetchUser();
   }, [token]);
 
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    setUser(null);
+    navigate("/login");
+  };
+
   return (
-    <header className="flex justify-between items-center border-b-[1px] p-8 border-[#333] dark:bg-neutral-950 sm:px-10">
+    <header className="flex justify-between items-center border-b-[1px] p-8 border-[#333] dark:bg-neutral-950 sm:px-10 dark:border-white">
       <div>
         <a
           className="font-bold text-xl 2xl:text-2xl cursor-pointer text-slate-900 dark:text-white"
@@ -56,7 +63,7 @@ const Header = () => {
           BLOGHUB.GE
         </a>
       </div>
-      <div className="flex justify-center items-center space-x-2 sm:space-x-8">
+      <div className="flex justify-center items-center space-x-3 sm:space-x-8">
         <div className="hidden lg:flex">
           <ul className="flex justify-center items-center space-x-6">
             <li className="flex justify-center items-center">
@@ -105,17 +112,41 @@ const Header = () => {
             </li>
           </ul>
         </div>
-        <DarkModeToggle />
-        <Link to="/profile" className="hidden lg:flex">
-          <Avatar>
-            <AvatarImage
-              src={user.profilePicture}
-              alt="@shadcn"
-              className="shadow-white"
-            />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-        </Link>
+        <div className="hidden sm:flex">
+          <DarkModeToggle />
+        </div>
+        <div className="hidden lg:flex">
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <Avatar>
+                <AvatarImage
+                  src={user.profilePicture}
+                  alt="@shadcn"
+                  className="shadow-white"
+                />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <Link to="/profile">
+                  <Button>
+                    {" "}
+                    <FaUser className="mr-2 w- h-4" /> Profile
+                  </Button>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Button variant={"secondary"} onClick={handleLogout}>
+                  {" "}
+                  <FaDoorOpen className="mr-2 w- h-4" /> Logout
+                </Button>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
         <div className="lg:hidden">
           <DropdownMenu>
             <DropdownMenuTrigger>
@@ -132,10 +163,12 @@ const Header = () => {
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
-                <Button>
-                  {" "}
-                  <FaUser className="mr-2 w- h-4" /> Profile
-                </Button>
+                <Link to="/profile">
+                  <Button>
+                    {" "}
+                    <FaUser className="mr-2 w- h-4" /> Profile
+                  </Button>
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Button>
@@ -144,10 +177,13 @@ const Header = () => {
                 </Button>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Button variant={"secondary"}>
+                <Button variant={"secondary"} onClick={handleLogout}>
                   {" "}
                   <FaDoorOpen className="mr-2 w- h-4" /> Logout
                 </Button>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="sm:hidden flex justify-center items-center">
+                <DarkModeToggle />
               </DropdownMenuItem>
               <DropdownMenuLabel>Navigation</DropdownMenuLabel>
               <DropdownMenuItem>
