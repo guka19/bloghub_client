@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import DarkModeToggle from "@/components/ui/darkModeToggle";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const RegisterPage = () => {
   const [username, setUsername] = useState("");
@@ -12,6 +14,8 @@ const RegisterPage = () => {
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
   const [profilePicture, setProfilePicture] = useState();
+
+  const navigate = useNavigate();
 
   const register = async () => {
     try {
@@ -45,7 +49,10 @@ const RegisterPage = () => {
       });
   
       const result = await response.json();
-      console.log(result);
+      const token = result.token;
+      localStorage.setItem("authToken", token);
+      toast.success("Successfully registered");
+      navigate("/")
     } catch (error) {
       console.error("Error during registration:", error);
     }
@@ -128,7 +135,7 @@ const RegisterPage = () => {
                 if (e.target.files && e.target.files[0]) {
                   setProfilePicture(e.target.files[0]);
                 }
-              }}``
+              }}
             />
           </div>
           <div className="mb-4">
